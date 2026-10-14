@@ -1,0 +1,8 @@
+[
+  {
+    "id": "CVE-DEMO-1",
+    "severity": "MEDIUM",
+    "title": "Jackson Databind outdated",
+    "component": "com.fasterxml.jackson.core:jackson-databind:2.18.8"
+  }
+]

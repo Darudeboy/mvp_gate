@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/release-gate/catalog.schema.json",
+  "title": "Release Gate Catalog",
+  "type": "object",
+  "required": ["version", "services"],
+  "properties": {
+    "version": { "type": "string" },
+    "generated_at": { "type": ["string", "null"], "format": "date-time" },
+    "source": { "type": ["string", "null"] },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["service_id", "name"],
+        "properties": {
+          "service_id": { "type": "string" },
+          "name": { "type": "string" },
+          "cluster": { "type": ["string", "null"] },
+          "impact": { "type": ["string", "null"] },
+          "pio": { "type": ["string", "null"] },
+          "delivery": { "type": ["string", "null"] },
+          "repository": { "type": ["string", "null"] },
+          "project_key": { "type": ["string", "null"] },
+          "kae_ids": { "type": "array", "items": { "type": "string" } },
+          "escalation": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["role"],
+              "properties": {
+                "role": { "type": "string" },
+                "name": { "type": ["string", "null"] },
+                "email": { "type": ["string", "null"] }
+              }
+            }
+          },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "kaes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kae_id", "name"],
+        "properties": {
+          "kae_id": { "type": "string" },
+          "name": { "type": "string" },
+          "platforms": { "type": "array", "items": { "type": "string" } },
+          "services": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "overrides": [
+    {
+      "check_id": "sonar_exclusions",
+      "reason": "Agreed temporary exclusion during migration; tracked in TECH-42",
+      "approver": "s.nikonov"
+    }
+  ]
+}

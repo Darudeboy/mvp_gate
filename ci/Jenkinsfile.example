@@ -1,0 +1,34 @@
+// Example Jenkins declarative snippet for the shadow pilot.
+pipeline {
+  agent { docker { image 'release-gate:0.1.0' args '-v $WORKSPACE/artifacts:/artifacts' } }
+  environment {
+    RELEASE_GATE_MODE = 'shadow'
+    RELEASE_GATE_CATALOG = 'catalog/catalog.yaml'
+    RELEASE_GATE_DRY_RUN = 'false'
+    JIRA_BASE_URL = credentials('jira-base-url-text')
+    JIRA_TOKEN = credentials('jira-token')
+    BITBUCKET_BASE_URL = credentials('bitbucket-base-url-text')
+    BITBUCKET_TOKEN = credentials('bitbucket-token')
+    SONAR_BASE_URL = credentials('sonar-base-url-text')
+    SONAR_TOKEN = credentials('sonar-token')
+  }
+  stages {
+    stage('Release Gate') {
+      steps {
+        sh '''
+          release-gate run \
+            --release-id "$RELEASE_ID" \
+            --repository "$REPO" \
+            --commit "$GIT_COMMIT" \
+            --pr-id "${PR_ID:-}" \
+            --phase "${PHASE:-pr}" \
+            --mode shadow \
+            --output /artifacts \
+            --publish \
+            --build-url "$BUILD_URL"
+        '''
+        archiveArtifacts artifacts: 'artifacts/**', fingerprint: true
+      }
+    }
+  }
+}

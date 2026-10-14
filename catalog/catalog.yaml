@@ -1,0 +1,69 @@
+version: "1"
+generated_at: "2026-10-14T00:00:00Z"
+source: "confluence:Service Owners Matrix + Project Config (imported)"
+services:
+  - service_id: "voice-of-employee"
+    name: "Voice of Employee"
+    cluster: "HR Tech"
+    impact: "medium"
+    pio: "lead.example@company.local"
+    delivery: "delivery.hr@company.local"
+    repository: "HR/voice-of-employee"
+    project_key: "HR"
+    kae_ids: ["KAE-VOE"]
+    escalation:
+      - role: "PIO"
+        name: "Example Lead"
+        email: "lead.example@company.local"
+      - role: "Delivery"
+        name: "HR Delivery"
+        email: "delivery.hr@company.local"
+    tags: ["backend"]
+  - service_id: "payments-api"
+    name: "Payments API"
+    cluster: "Payments"
+    impact: "high"
+    pio: "payments.pio@company.local"
+    delivery: "delivery.payments@company.local"
+    repository: "PAY/payments-api"
+    project_key: "PAY"
+    kae_ids: ["KAE-PAY-CORE"]
+    escalation:
+      - role: "PIO"
+        name: "Payments PIO"
+        email: "payments.pio@company.local"
+      - role: "Delivery"
+        name: "Payments Delivery"
+        email: "delivery.payments@company.local"
+    tags: ["backend"]
+  - service_id: "coretech-web"
+    name: "CoreTech Web"
+    cluster: "CoreTech"
+    impact: "high"
+    pio: "coretech.lead@company.local"
+    delivery: "delivery.coretech@company.local"
+    repository: "CT/coretech-web"
+    project_key: "CT"
+    kae_ids: ["KAE-CT-WEB"]
+    tags: ["web", "coretech"]
+kaes:
+  - kae_id: "KAE-VOE"
+    name: "Voice of Employee unit"
+    platforms: ["backend"]
+    services: ["voice-of-employee"]
+  - kae_id: "KAE-PAY-CORE"
+    name: "Payments Core"
+    platforms: ["backend"]
+    services: ["payments-api"]
+  - kae_id: "KAE-CT-WEB"
+    name: "CoreTech Web module"
+    platforms: ["web"]
+    services: ["coretech-web"]
+  - kae_id: "KAE-CT-IOS"
+    name: "CoreTech iOS module"
+    platforms: ["ios"]
+    services: []
+  - kae_id: "KAE-CT-ANDROID"
+    name: "CoreTech Android module"
+    platforms: ["android"]
+    services: []

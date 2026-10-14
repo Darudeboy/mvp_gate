@@ -1,0 +1,5 @@
+{
+  "service_id": "payments-api",
+  "kae_id": "KAE-PAY-CORE",
+  "repository": "PAY/payments-api"
+}

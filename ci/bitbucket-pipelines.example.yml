@@ -1,0 +1,61 @@
+# Pilot pipeline snippet — shadow mode first.
+# Copy the release-gate step into a service repo or a shared pipeline template.
+
+image: python:3.12
+
+definitions:
+  steps:
+    - step: &release-gate-shadow
+        name: Release Gate (shadow)
+        caches:
+          - pip
+        script:
+          - pip install /opt/release-gate || pip install .
+          # Discover changed files for PR builds
+          - |
+            if [ -n "${BITBUCKET_PR_ID:-}" ]; then
+              git fetch origin "+refs/pull-requests/${BITBUCKET_PR_ID}/from:pr" || true
+              git diff --name-only "origin/${BITBUCKET_PR_DESTINATION_BRANCH:-master}...HEAD" > changed-files.txt || true
+            else
+              git diff --name-only HEAD~1 HEAD > changed-files.txt || true
+            fi
+          - |
+            release-gate run \
+              --release-id "${RELEASE_ID:-${BITBUCKET_BRANCH}}" \
+              --repository "${BITBUCKET_PROJECT_KEY}/${BITBUCKET_REPO_SLUG}" \
+              --commit "${BITBUCKET_COMMIT}" \
+              --pr-id "${BITBUCKET_PR_ID:-}" \
+              --phase "${RELEASE_GATE_PHASE:-pr}" \
+              --mode shadow \
+              --catalog "${RELEASE_GATE_CATALOG:-catalog/catalog.yaml}" \
+              --output artifacts \
+              --changed-files-from changed-files.txt \
+              --build-url "${BITBUCKET_GIT_HTTP_ORIGIN}/addon/pipelines/home#!/results/${BITBUCKET_BUILD_NUMBER}" \
+              --publish
+        artifacts:
+          - artifacts/**
+        # Shadow mode always exits 0; enforce later by setting RELEASE_GATE_MODE=enforce
+
+pipelines:
+  pull-requests:
+    '**':
+      - step: *release-gate-shadow
+  branches:
+    'REL-*':
+      - step:
+          <<: *release-gate-shadow
+          name: Release Gate (release branch shadow)
+          script:
+            - export RELEASE_GATE_PHASE=release
+            - pip install .
+            - |
+              release-gate run \
+                --release-id "${BITBUCKET_BRANCH}" \
+                --repository "${BITBUCKET_PROJECT_KEY}/${BITBUCKET_REPO_SLUG}" \
+                --commit "${BITBUCKET_COMMIT}" \
+                --phase release \
+                --mode shadow \
+                --output artifacts \
+                --publish
+          artifacts:
+            - artifacts/**

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Release Gate {{ report.release_id }}</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a222c;
+      --text: #e7ecf1;
+      --muted: #9aa7b5;
+      --pass: #3d9a6a;
+      --warn: #c4922a;
+      --block: #c44b4b;
+      --unknown: #6b7785;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(circle at top left, #1c2a38, var(--bg));
+      color: var(--text);
+      padding: 2rem;
+    }
+    h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+    .meta { color: var(--muted); margin-bottom: 1.5rem; }
+    .overall {
+      display: inline-block;
+      padding: .35rem .75rem;
+      border-radius: 6px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      background: var(--panel);
+    }
+    .PASS { color: var(--pass); border: 1px solid var(--pass); }
+    .WARN { color: var(--warn); border: 1px solid var(--warn); }
+    .BLOCK { color: var(--block); border: 1px solid var(--block); }
+    .UNKNOWN { color: var(--unknown); border: 1px solid var(--unknown); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      text-align: left;
+      padding: .75rem 1rem;
+      border-bottom: 1px solid #2a3542;
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; font-size: .85rem; }
+    code { font-size: .9rem; }
+    .evidence { color: var(--muted); font-size: .85rem; margin: .25rem 0 0; }
+    .overrides { margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Release Gate</h1>
+  <div class="meta">
+    {{ report.release_id }} · {{ report.repository }} · {{ report.commit[:12] }}
+    · {{ report.phase.value }} · {{ report.mode.value }}
+    · {{ report.generated_at }}
+  </div>
+  <p><span class="overall {{ report.overall.value }}">{{ report.overall.value }}</span></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Check</th>
+        <th>Summary / evidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for check in report.checks %}
+      <tr>
+        <td class="{{ check.status.value }}">{{ check.status.value }}</td>
+        <td><code>{{ check.check_id }}</code><br/><small>{{ check.title }}</small></td>
+        <td>
+          {{ check.summary }}
+          {% for ev in check.evidence %}
+          <div class="evidence">{{ ev.label }}: {{ ev.value }}{% if ev.url %} (<a href="{{ ev.url }}">link</a>){% endif %}</div>
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if report.overrides %}
+  <div class="overrides">
+    <h2>Manual overrides</h2>
+    <ul>
+      {% for ov in report.overrides %}
+      <li><code>{{ ov.check_id }}</code> by <strong>{{ ov.approver }}</strong>: {{ ov.reason }} ({{ ov.at }})</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</body>
+</html>
